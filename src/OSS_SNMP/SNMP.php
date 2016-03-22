@@ -1089,4 +1089,16 @@ class SNMP
             return $this->parseSnmpValue($value);
         }, $result);
     }
+    
+    public function parseSnmpString( $v )
+    {
+        // first, rule out an empty string
+        if( $v == '""' || $v == '' )
+            return "";
+
+        $type = substr( $v, 0, strpos( $v, ':' ) );
+        $value = trim( substr( $v, strpos( $v, ':' ) + 1 ) );
+
+        return $value;
+    }
 }
