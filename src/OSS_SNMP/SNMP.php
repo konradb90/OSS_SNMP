@@ -524,13 +524,17 @@ class SNMP
             case 'OID':
                 $rtn = (string)$value;
                 break;
+                
+            case 'BITS':
+                $rtn = (string)$value;
+                break;
 
             case 'Timeticks':
                 $rtn = (int)substr( $value, 1, strrpos( $value, ')' ) - 1 );
                 break;
 
             default:
-                throw new Exception( "ERR: Unhandled SNMP return type: $type\n" );
+                $rtn = $value;
         }
 
         return $rtn;
