@@ -1042,11 +1042,11 @@ class SNMP
      * @param array $array
      * @param array $omittedOids
      * @param bool $haltOnAnyProblem
+     * @param int $depth
      * @return array|string
      * @throws Exception
      */
-
-    public function realMultiWalk($oid, $defaultValue = '', $array = [], $omittedOids = [], $haltOnAnyProblem = false)
+    public function realMultiWalk($oid, $defaultValue = '', $array = [], $omittedOids = [], $haltOnAnyProblem = false, $depth = 1)
     {
         $result = $this->realWalk($oid, $defaultValue);
 
@@ -1056,16 +1056,30 @@ class SNMP
 
         if (!empty($result)) {
             foreach ($result as $oid => $entry) {
-                list($oid2, $index) = explode('.', $oid);
+                if($depth == 1) {
+                    list($oid2, $index) = explode('.', $oid);
 
-                if (in_array($oid2, $omittedOids)) {
-                    $value = $this->parseSnmpString($entry);
-                } else {
-                    $value = $this->parseSnmpValue($entry);
-                }
+                    if (in_array($oid2, $omittedOids)) {
+                        $value = $this->parseSnmpString($entry);
+                    } else {
+                        $value = $this->parseSnmpValue($entry);
+                    }
 
-                if (!strstr($value, 'at this OID') && isset($oid2) && isset($index)) {
-                    $array[$index][$oid2] = $value;
+                    if (!strstr($value, 'at this OID') && isset($oid2) && isset($index)) {
+                        $array[$index][$oid2] = $value;
+                    }
+                } elseif($depth == 2) {
+                    list($oid2, $index, $second) = explode('.', $oid);
+
+                    if (in_array($oid2, $omittedOids)) {
+                        $value = $this->parseSnmpString($entry);
+                    } else {
+                        $value = $this->parseSnmpValue($entry);
+                    }
+
+                    if (!strstr($value, 'at this OID') && isset($oid2) && isset($index) && isset($second)) {
+                        $array[$index][$second][$oid2] = $value;
+                    }
                 }
             }
 
